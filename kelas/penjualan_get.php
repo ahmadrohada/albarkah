@@ -32,9 +32,7 @@ case "penjualan_list":
 								a.user_id,
 								a.pelanggan_id,
 								a.total_belanja,
-								a.total_komisi,
-								a.total_tambahan,
-								a.total_pengurangan,
+								a.total_diskon,
 								a.bayar,
 								a.type_bayar,
 								b.nama,
@@ -73,7 +71,7 @@ case "penjualan_list":
 	
 		$keterangan = $x->keterangan;
 		if ( $type == 'Hutang'){
-			$sisa = (($x->total_belanja - $x->total_komisi)+$x->total_tambahan - $x->total_pengurangan )- ($x->bayar+$bayar_x);
+			$sisa = (($x->total_belanja - $x->total_diskon)+$x->total_tambahan - $x->total_pengurangan )- ($x->bayar+$bayar_x);
 
 			if ( $sisa == 0 ) {
 				$type = "Lunas";
@@ -94,9 +92,7 @@ case "penjualan_list":
 
 
 			$h['total_belanja']		= number_format($x->total_belanja,'0',',','.');
-			$h['total_komisi']		= number_format($x->total_komisi,'0',',','.');
-			$h['total_tambahan']	= number_format($x->total_tambahan,'0',',','.');
-			$h['total_pengurangan']	= number_format($x->total_pengurangan,'0',',','.');
+			$h['total_diskon']		= number_format($x->total_diskon,'0',',','.');
 			$h['bayar']				= number_format($x->bayar,'0',',','.');
 			$h['type_bayar']		= $type;
 			$h['sisa']				= number_format($sisa,'0',',','.');
@@ -121,14 +117,16 @@ case "tmp_penjualan_list":
 	$response["tmp_penjualan_list"] = array();
 	$response["detail_penjualan_list"] = array();
 	$total					= 0;
-	$total_potongan			= 0;
+	$total_diskon			= 0;
 
 	$query = $koneksi->prepare(" SELECT 	
 									a.id,
-									a.harga_satuan,
+									a.harga_jual,
 									a.quantity,
-									a.potongan,
+									a.diskon,
 									b.nama_barang,
+									b.merk,
+									b.spesifikasi,
 									b.satuan
 
 									FROM tmp_transaksi a
@@ -144,28 +142,29 @@ case "tmp_penjualan_list":
 
 	while($x = $query->fetch(PDO::FETCH_OBJ)) {
 			
-			$jumlah	 		= $x->quantity*$x->harga_satuan  ;
+			$jumlah	 		= $x->quantity*( $x->harga_jual - $x->diskon )  ;
 
 			$no++;
 			$h['no']			= $no;
 			$h['id']			= $x->id;
-			$h['nama_barang']	= $x->nama_barang;
+			$h['nama_barang']	= $x->nama_barang.' '.$x->merk.' '.$x->spesifikasi;
 			$h['satuan']		= $x->satuan;
 			$h['quantity']		= $x->quantity;
-			$h['potongan']		= number_format($x->potongan,'0',',','.');
-			$h['harga_satuan']	= number_format($x->harga_satuan,'0',',','.');
+			$h['diskon']		= number_format($x->diskon,'0',',','.');
+			$h['harga_jual']	= number_format($x->harga_jual,'0',',','.');
+			$h['diskon']		= number_format($x->diskon,'0',',','.');
 			
 			$h['jumlah']		= number_format($jumlah,'0',',','.');
 							
 			array_push($response["tmp_penjualan_list"], $h);
 
 			$total				= $total + $jumlah;
-			$total_potongan		= $total_potongan + $x->potongan;
+			$total_diskon		= $total_diskon + $x->diskon;
 			
 	}	
 
 	$gt['total']				= number_format($total,'0',',','.');
-	$gt['total_potongan']		= number_format($total_potongan,'0',',','.');
+	$gt['total_diskon']			= number_format($total_diskon,'0',',','.');
 
 
 	array_push($response["detail_penjualan_list"], $gt);
@@ -204,8 +203,8 @@ case "tmp_tambahan_list":
 	while($x = $query->fetch(PDO::FETCH_OBJ)) {
 
 			/* if ( $x->discount > 0 ){
-				$potongan   = ($x->discount/100)*$x->harga;
-				$jumlah		= ($x->harga-$potongan)*$x->qty;
+				$diskon   = ($x->discount/100)*$x->harga;
+				$jumlah		= ($x->harga-$diskon)*$x->qty;
 			}else{
 				$jumlah		= $x->harga*$x->qty;
 			} */
@@ -268,8 +267,8 @@ case "tmp_tambahan_list_beli":
 	while($x = $query->fetch(PDO::FETCH_OBJ)) {
 
 			/* if ( $x->discount > 0 ){
-				$potongan   = ($x->discount/100)*$x->harga;
-				$jumlah		= ($x->harga-$potongan)*$x->qty;
+				$diskon   = ($x->discount/100)*$x->harga;
+				$jumlah		= ($x->harga-$diskon)*$x->qty;
 			}else{
 				$jumlah		= $x->harga*$x->qty;
 			} */
@@ -332,8 +331,8 @@ case "tmp_pengurangan_list":
 	while($x = $query->fetch(PDO::FETCH_OBJ)) {
 
 			/* if ( $x->discount > 0 ){
-				$potongan   = ($x->discount/100)*$x->harga;
-				$jumlah		= ($x->harga-$potongan)*$x->qty;
+				$diskon   = ($x->discount/100)*$x->harga;
+				$jumlah		= ($x->harga-$diskon)*$x->qty;
 			}else{
 				$jumlah		= $x->harga*$x->qty;
 			} */
@@ -396,8 +395,8 @@ case "tmp_pengurangan_list_beli":
 	while($x = $query->fetch(PDO::FETCH_OBJ)) {
 
 			/* if ( $x->discount > 0 ){
-				$potongan   = ($x->discount/100)*$x->harga;
-				$jumlah		= ($x->harga-$potongan)*$x->qty;
+				$diskon   = ($x->discount/100)*$x->harga;
+				$jumlah		= ($x->harga-$diskon)*$x->qty;
 			}else{
 				$jumlah		= $x->harga*$x->qty;
 			} */
@@ -453,7 +452,7 @@ case "transaksi_penjualan_list_item":
 	$response["tmp_penjualan_list"] = array();
 	$response["detail_penjualan_list"] = array();
 	$total					= 0;
-	$total_komisi			= 0;
+	$total_diskon			= 0;
 	$total_retur			= 0;
 	$query->execute();
 	
@@ -481,7 +480,7 @@ case "transaksi_penjualan_list_item":
 			array_push($response["tmp_penjualan_list"], $h);
 
 			$total				= $total + $jumlah;
-			$total_komisi		= $total_komisi + $komisi;
+			$total_diskon		= $total_diskon + $komisi;
 			$total_retur		= $total_retur + $jumlah_retur;
 	}	
 
@@ -489,7 +488,7 @@ case "transaksi_penjualan_list_item":
 
 	$gt['total']				= number_format($total,'0',',','.');
 
-	$gt['total_komisi']			= number_format($total_komisi,'0',',','.');
+	$gt['total_diskon']			= number_format($total_diskon,'0',',','.');
 	$gt['total_retur']			= number_format($total_retur,'0',',','.');
 
 
@@ -522,14 +521,14 @@ case "transaksi_retur_penjualan_list_item":
 	$response["retur_penjualan_list"] = array();
 	$response["detail_penjualan_list"] = array();
 	$total					= 0;
-	$total_komisi			= 0;
+	$total_diskon			= 0;
 	$query->execute();
 	
 	while($x = $query->fetch(PDO::FETCH_OBJ)) {
 
 			/* if ( $x->discount > 0 ){
-				$potongan   = ($x->discount/100)*$x->harga;
-				$jumlah		= ($x->harga-$potongan)*$x->outcome;
+				$diskon   = ($x->discount/100)*$x->harga;
+				$jumlah		= ($x->harga-$diskon)*$x->outcome;
 			}else{
 				$jumlah		= $x->harga*$x->outcome;
 			} */
@@ -570,7 +569,7 @@ case"detail_transaksi_penjualan":
 								a.tgl_nota,
 								a.type_bayar,
 								a.total_belanja,
-								a.total_komisi,
+								a.total_diskon,
 								a.total_tambahan,
 								a.total_pengurangan,
 								a.bayar,
@@ -618,7 +617,7 @@ case"detail_transaksi_penjualan":
 			$bayar_x = $x->bayar;
 		}
 
-		$total_bayar = ($x->total_belanja-$x->total_komisi)+$x->total_tambahan - $x->total_pengurangan;
+		$total_bayar = ($x->total_belanja-$x->total_diskon)+$x->total_tambahan - $x->total_pengurangan;
 		$kembali 	 = $bayar_x - $total_bayar;
 
 		$detail_penjualan = array(
@@ -630,7 +629,7 @@ case"detail_transaksi_penjualan":
 					'status'		=> $x->type_bayar,
 					'nama_user'		=> $x->nama_user,
 					'total_belanja'	=> number_format($x->total_belanja,'0',',','.'),
-					'total_komisi'	=> number_format($x->total_komisi,'0',',','.'),
+					'total_diskon'	=> number_format($x->total_diskon,'0',',','.'),
 					'total_tambahan'=> number_format($x->total_tambahan,'0',',','.'),
 					'total_pengurangan'=> number_format($x->total_pengurangan,'0',',','.'),
 					'total_bayar'   => number_format($total_bayar,'0',',','.'),

@@ -9,8 +9,8 @@ if(isset($_SESSION['md_user_id'])){
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>PD Mustika Dewi</title>
-  <link rel="icon" type="image/png" href="favicon_png.png" />
+  <title>Al Barkah</title>
+  <link rel="icon" type="image/png" href="al_barkah_favicon.png" />
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <link rel="stylesheet" href="./assets/bower_components/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="./assets/bower_components/font-awesome/css/font-awesome.min.css">
@@ -19,7 +19,7 @@ if(isset($_SESSION['md_user_id'])){
   
   <link rel="stylesheet" href="./assets/css/bootstrap-table.css">
   <link rel="stylesheet" href="./assets/css/jquery.datetimepicker.css" />
-  <link rel="stylesheet" href="./assets/bower_components/sweetalert2/sweetalert2.css">
+  <link rel="stylesheet" href="./assets/bower_components/sweetalert/sweetalert2.css">
 
 
   <link rel="stylesheet" href="./assets/css/select2.css">
@@ -42,12 +42,12 @@ if(isset($_SESSION['md_user_id'])){
 	<!-- <script src="js/bootstrap-datepicker.js"></script> -->
 	<script src="assets/js/bootstrap-table.js"></script>
 	<script src="assets/js/bootstrap3-typeahead.min.js"></script>
-  <script src="./assets/js/select2.full.js"></script>
+	<script src="./assets/js/select2.full.js"></script>
 	<script src="assets/js/jquery.datetimepicker.full.min.js"></script>
 	
-  <script src="assets/js/jquery.validate.js"></script>
+	<script src="assets/js/jquery.validate.js"></script>
   
-  <script src="assets/bower_components/jQuery.print-master/dist/jQuery.print.min.js"></script>
+	<script src="assets/bower_components/jQuery.print-master/dist/jQuery.print.min.js"></script>
 
 
 	<!-- SlimScroll 
@@ -61,7 +61,7 @@ if(isset($_SESSION['md_user_id'])){
 
 </head>
 <!-- ADD THE CLASS sidebar-collapse TO HIDE THE SIDEBAR PRIOR TO LOADING THE SITE -->
-<body class="hold-transition skin-purple sidebar-collapse sidebar-mini">
+<body class="hold-transition skin-yellow sidebar-collapse sidebar-mini">
 <div class="se-pre-con"></div>
 <!-- Site wrapper -->
 <div class="wrapper">
@@ -70,9 +70,9 @@ if(isset($_SESSION['md_user_id'])){
     <!-- Logo -->
     <a href="#" class="logo">
       <!-- mini logo for sidebar mini 50x50 pixels -->
-      <span class="logo-mini"><b>M</b>D</span>
+      <span class="logo-mini"><b>A</b>B</span>
       <!-- logo for regular state and mobile devices -->
-      <span class="logo-lg"><b>Mustika Dewi</b></span>
+      <span class="logo-lg"><b>Al Barkah</b></span>
     </a>
     <!-- Header Navbar: style can be found in header.less -->
     <nav class="navbar navbar-static-top">
@@ -136,8 +136,8 @@ if(isset($_SESSION['md_user_id'])){
 				include "menu_admin.php";
 			}
 			
-			if($group=='pegawai'){
-				include "menu_pegawai.php";
+			if($group=='kasir'){
+				include "menu_kasir.php";
 			}
 		
 		?>
@@ -372,52 +372,57 @@ $(document).ready(function () {
 		e.preventDefault();
 			
 			
-			swal({
-				title: "Logout",
-				text: "keluar dari aplikasi",
-				type: "question",
-				showCancelButton: true,
-				confirmButtonText: "Ya",
-				cancelButtonText: "Batal",
-				closeOnConfirm: false
-			}).then (function(){
-				$.ajax({
-				type: 'POST',
-				url:"./kelas/login_handler.php",
-				data: {logout:'1'},
-				cache: false,
-				success: function(e) {
-					swal({
-						title: "",
-						text: "Sukses",
-						type: "success",
-						width: "200px",
-						showConfirmButton: false,
-						allowOutsideClick : false,
-						timer: 1200
-					}).then(function () {
-						window.location.assign("index.php");
-					},
-						// handling the promise rejection
-						function (dismiss) {
-							if (dismiss === 'timer') {
-								window.location.assign("index.php");
-							}
-						}
-					)
-					
-				},
-					error: function(data) {  
-						swal({
-							title: "Error",
-							text: "Terjadi kesalahan saat logout",
-							type: "error"
-						}).then (function(){
-							
-						});
-					}
-				});
-				});
+            e.preventDefault();
+
+
+            swal.fire({
+                title: "Logout",
+                text: "keluar dari aplikasi",
+                type: "question",
+                showCancelButton: true,
+                confirmButtonText: "Ya",
+                cancelButtonText: "Batal",
+                closeOnConfirm: false
+            }).then((result) => {
+                if (result.value) {
+                    $.ajax({
+                        type    : 'POST',
+						url		:"./kelas/login_handler.php",
+						data	: {logout:'1'},
+                        cache: false,
+                        success: function(e) {
+                            swal.fire({
+                                title: "",
+                                text: "Sukses",
+                                type: "success",
+                                width: "200px",
+                                showConfirmButton: false,
+                                allowOutsideClick: false,
+                                timer: 1200
+                            }).then(function() {
+                                    window.location.assign("index.php");
+                                },
+                                // handling the promise rejection
+                                function(dismiss) {
+                                    if (dismiss === 'timer') {
+                                        window.location.assign("index.php");
+                                    }
+                                }
+                            )
+
+                        },
+                        error: function(data) {
+                            swal({
+                                title: "Error",
+                                text: "Terjadi kesalahan saat logout",
+                                type: "error"
+                            }).then(function() {
+
+                            });
+                        }
+                    });
+                }
+            })
 		
 		});
 		

@@ -13,21 +13,19 @@
 <meta name="subject" content="" />
 
 
-
-<link rel="icon" type="image/png" href="favicon_png.png" />
+<link rel="icon" type="image/png" href="al_barkah_favicon.png" />
 <link href="./assets/css/bootstrap.min.css" rel="stylesheet">
 <link href="./assets/css/styles.css" rel="stylesheet">
 <link href="./assets/css/font-awesome.css"  rel="stylesheet" />
 <link href="./assets/css/font-awesome-animation.css"  rel="stylesheet" />
-<link href="./assets/css/sweetalert2.css"rel="stylesheet" >
 
 
-<title>Mustika Dewi</title>
+<title>Al Barkah</title>
 
 
 </head>
 
-<body style="padding-top:10px !important;">
+<body style="">
 <div class="se-pre-con"></div>
 
 
@@ -36,15 +34,15 @@
 session_start();
 if ( !isset($_SESSION['md_user_id'])){ 
 ?>	
-	<div class="col-sm-12 col-lg-12  main">			
-		<div id="content" style="margin-top:-10px;">
+	<div style="background-image: url('./assets/images/background_bg.jpg'); height:920px; background-position: center; background-repeat: no-repeat; background-size: cover;" class="col-sm-12 col-lg-12  main">			
+		<div id="content" style="margin-top:30px;">
 			<?php include "login.php"; ?>
 		</div>
 	</div>	<!--/.main-->
 <?php } else { ?>
 <script>
 	//alert("udah");
-	window.location.href="home.php?page=dashboard_transaksi";
+	window.location.href="home.php?page=transaksi_penjualan";
 </script>
 <?php } ?>	
 	

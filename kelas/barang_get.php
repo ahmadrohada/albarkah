@@ -16,15 +16,14 @@ $op				= isset($_GET['op'])?$_GET['op']:null;
 switch($op){
 case"nama_barang_select2":
 
-		$nama_barang 		 =  isset($_GET['nama_barang'])?$_GET['nama_barang']:null;
+		$cari 		 =  isset($_GET['nama_barang'])?$_GET['nama_barang']:null;
 		$query = $koneksi->prepare(" SELECT 	
-											a.id,
-											a.nama_barang,
-											a.satuan,
-											a.harga_jual
+											a.*
 											FROM barang a
 											
-											WHERE a.nama_barang LIKE '%$nama_barang%'	
+											WHERE a.nama_barang LIKE '%$cari%'	
+											OR a.spesifikasi LIKE '%$cari%'
+											OR a.merk LIKE '%$cari%'
 											ORDER by a.nama_barang ASC 
 											");
 
@@ -36,7 +35,7 @@ case"nama_barang_select2":
 						$item[] = array(
 									'no'			=> $no,
 									'id'			=> $x->id,
-									'nama_barang'	=> $x->nama_barang,
+									'nama_barang'	=> $x->nama_barang.' '.$x->merk.' '.$x->spesifikasi,
 						);
 
 			}	
@@ -58,6 +57,8 @@ case"detail_barang":
 	$query = $koneksi->prepare(" SELECT 	
 						a.id,
 						a.harga_jual,
+						a.harga_beli,
+						a.diskon,
 						a.satuan
 
 						FROM barang a 
@@ -74,13 +75,16 @@ case"detail_barang":
 
 	
 		$detail_barang = array(
-					'harga_satuan'		=> number_format($x->harga_jual,'0',',','.'),
+					'harga_jual'		=> number_format($x->harga_jual,'0',',','.'),
+					'harga_beli'		=> number_format($x->harga_beli,'0',',','.'),
+					'diskon'			=> number_format($x->diskon,'0',',','.'),
 					'satuan'			=> $x->satuan
 		);
 	}else{
 		
 		$detail_barang	= array(
-			'harga_satuan'		=> "",
+			'harga_beli'		=> "",
+			'harga_jual'		=> "",
 			'satuan'			=> ""
 		);
 

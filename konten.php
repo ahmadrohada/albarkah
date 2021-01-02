@@ -8,8 +8,8 @@ case "admin":
 	$page="files_admin/".$_GET['page'];
 
 break;
-case "pegawai":
-	$page="files_pegawai/".$_GET['page'];
+case "kasir":
+	$page="files_kasir/".$_GET['page'];
 
 break;
 }

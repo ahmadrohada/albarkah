@@ -31,19 +31,19 @@ case "add_item_pembelian":
 	$jenis_beras_id 	= preg_replace('/[^0-9]/', '', $_POST['jenis_beras']);	
 	$harga 				= preg_replace('/[^0-9]/', '', $_POST['harga']);	
 	$tonase 			= $_POST['tonase'];	
-	$qty 				= preg_replace('/[^0-9]/', '', $_POST['qty']);	
+	$quantity 				= preg_replace('/[^0-9]/', '', $_POST['quantity']);	
 	
 
 	if ( ($nama_karung != "")&( $jenis_beras_id != "") ){
 		try{
-			$query = $koneksi->prepare("INSERT INTO tmp_transaksi  (no_nota, jenis_transaksi, jenis_beras_id,nama_karung,qty,tonase,harga,upah_kuli)
+			$query = $koneksi->prepare("INSERT INTO tmp_transaksi  (no_nota, jenis_transaksi, jenis_beras_id,nama_karung,quantity,tonase,harga,upah_kuli)
 													VALUES(:a,:b,:c,:d,:e,:f,:g ,:h)");
 			$query->execute(array(
 								"a" => $no_nota,
 								"b" => 'pembelian',
 								"c" => $jenis_beras_id,
 								"d" => $nama_karung,
-								"e" => $qty,
+								"e" => $quantity,
 								"f" => $tonase,
 								"g" => $harga,
 								"h" => 10
@@ -66,19 +66,23 @@ case "add_item_penjualan":
 
 	$no_nota 			= $_POST['no_nota'];
 	$id_barang 			= $_POST['nama_barang'];
-	$harga_satuan 		= preg_replace('/[^0-9]/', '', $_POST['harga_satuan']);
-	$quantity 			= $_POST['qty'];
+	$harga_jual 		= preg_replace('/[^0-9]/', '', $_POST['harga_jual']);
+	$harga_beli 		= preg_replace('/[^0-9]/', '', $_POST['harga_beli']);
+	$diskon 			= preg_replace('/[^0-9]/', '', $_POST['diskon']);
+	$quantity 			= $_POST['quantity'];
 	
 	
 	try{
-			$query = $koneksi->prepare("INSERT INTO tmp_transaksi  (no_nota,jenis_transaksi,id_barang,harga_satuan,quantity)
-													VALUES(:a,:b,:c,:d,:e)");
+			$query = $koneksi->prepare("INSERT INTO tmp_transaksi  (no_nota,jenis_transaksi,id_barang,harga_jual,harga_beli,diskon,quantity)
+													VALUES(:a,:b,:c,:d,:e,:f,:g)");
 			$query->execute(array(
 								"a" => $no_nota,
 								"b" => 'penjualan',
 								"c" => $id_barang,
-								"d" => $harga_satuan,
-								"e" => $quantity
+								"d" => $harga_jual,
+								"e" => $harga_beli,
+								"f" => $diskon,
+								"g" => $quantity
 							));	
 			  
 	}
@@ -95,18 +99,18 @@ case "add_item_penjualan_2":
 	$nama_karung 		= $_POST['nama_karung'];
 	$harga 				= preg_replace('/[^0-9]/', '', $_POST['harga']);	
 	$tonase 			= $_POST['tonase'];	
-	$qty 				= preg_replace('/[^0-9]/', '', $_POST['qty']);	
+	$quantity 				= preg_replace('/[^0-9]/', '', $_POST['quantity']);	
 	
 
 	try{
-			$query = $koneksi->prepare("INSERT INTO tmp_transaksi  (no_nota, jenis_transaksi, stok_beras_id,nama_karung,qty,tonase,harga)
+			$query = $koneksi->prepare("INSERT INTO tmp_transaksi  (no_nota, jenis_transaksi, stok_beras_id,nama_karung,quantity,tonase,harga)
 													VALUES(:a,:b,:c,:d,:e,:f,:g)");
 			$query->execute(array(
 								"a" => $no_nota,
 								"b" => 'penjualan',
 								"c" => '',
 								"d" => $nama_karung,
-								"e" => $qty,
+								"e" => $quantity,
 								"f" => $tonase,
 								"g" => $harga
 							));	
@@ -118,18 +122,18 @@ case "add_item_penjualan_2":
 	}
 	
 break;
-case "update_qty_tmp":
+case "update_quantity_tmp":
 		
-	$qty  	= preg_replace('/[^0-9]/', '', $_POST['qty']);
+	$quantity  	= preg_replace('/[^0-9]/', '', $_POST['quantity']);
 	$id 	= preg_replace('/[^0-9]/', '', $_POST['id']);		
 	
 
 	try{
 		$update = $koneksi->prepare("UPDATE tmp_transaksi
-										SET 	qty			= :qty
+										SET 	quantity			= :quantity
 										WHERE id		= :id ");
 		$update->execute(array(
-								"qty" 		=> $qty,
+								"quantity" 		=> $quantity,
 								"id" 		=> $id
 							));	
 	}	  
@@ -139,18 +143,18 @@ case "update_qty_tmp":
 	}
 
 break;
-case "update_tonase_tmp":
+case "update_diskon_tmp":
 		
-	$tonase  	= $_POST['tonase'];
+	$diskon  	= preg_replace('/[^0-9]/', '', $_POST['diskon']);
 	$id 		= preg_replace('/[^0-9]/', '', $_POST['id']);		
 	
 
 	try{
 		$update = $koneksi->prepare("UPDATE tmp_transaksi
-										SET 	tonase	= :tonase
+										SET 	diskon	= :diskon
 										WHERE   id		= :id ");
 		$update->execute(array(
-								"tonase" 	=> $tonase,
+								"diskon" 	=> $diskon,
 								"id" 		=> $id
 							));	
 	}	  
@@ -246,18 +250,18 @@ case "add_item_tambahan":
 
 	$no_nota 			= $_POST['no_nota'];	
 	$item_tambahan 		= $_POST['item_tambahan'];	
-	$qty 				= preg_replace('/[^0-9]/', '', $_POST['qty']);	
+	$quantity 				= preg_replace('/[^0-9]/', '', $_POST['quantity']);	
 	$harga_satuan		= preg_replace('/[^0-9]/', '', $_POST['harga_satuan']);	
 	
 
 	if ( $item_tambahan != ""){
 		try{
-			$query = $koneksi->prepare("INSERT INTO tmp_tambahan  (no_nota,item_tambahan,qty,harga_satuan)
+			$query = $koneksi->prepare("INSERT INTO tmp_tambahan  (no_nota,item_tambahan,quantity,harga_satuan)
 													VALUES(:a,:b,:c,:d)");
 			$query->execute(array(
 								"a" => $no_nota,
 								"b" => $item_tambahan,
-								"c" => $qty,
+								"c" => $quantity,
 								"d" => $harga_satuan
 							));	
 			  
@@ -278,18 +282,18 @@ case "add_item_tambahan_beli":
 
 	$no_nota 			= $_POST['no_nota'];	
 	$item_tambahan 		= $_POST['item_tambahan'];	
-	$qty 				= preg_replace('/[^0-9]/', '', $_POST['qty']);	
+	$quantity 				= preg_replace('/[^0-9]/', '', $_POST['quantity']);	
 	$harga_satuan		= preg_replace('/[^0-9]/', '', $_POST['harga_satuan']);	
 	
 
 	if ( $item_tambahan != ""){
 		try{
-			$query = $koneksi->prepare("INSERT INTO tmp_tambahan_beli  (no_nota,item_tambahan,qty,harga_satuan)
+			$query = $koneksi->prepare("INSERT INTO tmp_tambahan_beli  (no_nota,item_tambahan,quantity,harga_satuan)
 													VALUES(:a,:b,:c,:d)");
 			$query->execute(array(
 								"a" => $no_nota,
 								"b" => $item_tambahan,
-								"c" => $qty,
+								"c" => $quantity,
 								"d" => $harga_satuan
 							));	
 			  
@@ -305,69 +309,7 @@ case "add_item_tambahan_beli":
 	
 
 break;
-case "update_qty_tmp_tambahan":
-		
-	$qty  	= preg_replace('/[^0-9]/', '', $_POST['qty']);
-	$id 			= preg_replace('/[^0-9]/', '', $_POST['id']);		
-	
 
-	try{
-		$update = $koneksi->prepare("UPDATE tmp_tambahan
-										SET 	qty		= :qty
-										WHERE   id		= :id ");
-		$update->execute(array(
-								"qty" 			=> $qty,
-								"id" 			=> $id
-							));	
-	}	  
-	catch ( PDOException $e)
-	{
-		header('HTTP/1.1 400 error'); //if error
-	}
-
-break;
-case "update_qty_tmp_tambahan_beli":
-		
-	$qty  	= preg_replace('/[^0-9]/', '', $_POST['qty']);
-	$id 			= preg_replace('/[^0-9]/', '', $_POST['id']);		
-	
-
-	try{
-		$update = $koneksi->prepare("UPDATE tmp_tambahan_beli
-										SET 	qty		= :qty
-										WHERE   id		= :id ");
-		$update->execute(array(
-								"qty" 			=> $qty,
-								"id" 			=> $id
-							));	
-	}	  
-	catch ( PDOException $e)
-	{
-		header('HTTP/1.1 400 error'); //if error
-	}
-
-break;
-case "update_harga_satuan_tmp_tambahan":
-		
-	$harga_satuan  	= preg_replace('/[^0-9]/', '', $_POST['harga_satuan']);
-	$id 			= preg_replace('/[^0-9]/', '', $_POST['id']);		
-	
-
-	try{
-		$update = $koneksi->prepare("UPDATE tmp_tambahan
-										SET 	harga_satuan		= :harga_satuan
-										WHERE   id					= :id ");
-		$update->execute(array(
-								"harga_satuan" 	=> $harga_satuan,
-								"id" 			=> $id
-							));	
-	}	  
-	catch ( PDOException $e)
-	{
-		header('HTTP/1.1 400 error'); //if error
-	}
-
-break;
 case "update_harga_satuan_tmp_tambahan_beli":
 		
 	$harga_satuan  	= preg_replace('/[^0-9]/', '', $_POST['harga_satuan']);
@@ -433,18 +375,18 @@ case "add_item_pengurangan":
 
 	$no_nota 			= $_POST['no_nota'];	
 	$item_pengurangan 		= $_POST['item_pengurangan'];	
-	$qty 				= preg_replace('/[^0-9]/', '', $_POST['qty']);	
+	$quantity 				= preg_replace('/[^0-9]/', '', $_POST['quantity']);	
 	$harga_satuan		= preg_replace('/[^0-9]/', '', $_POST['harga_satuan']);	
 	
 
 	if ( $item_pengurangan != ""){
 		try{
-			$query = $koneksi->prepare("INSERT INTO tmp_pengurangan  (no_nota,item_pengurangan,qty,harga_satuan)
+			$query = $koneksi->prepare("INSERT INTO tmp_pengurangan  (no_nota,item_pengurangan,quantity,harga_satuan)
 													VALUES(:a,:b,:c,:d)");
 			$query->execute(array(
 								"a" => $no_nota,
 								"b" => $item_pengurangan,
-								"c" => $qty,
+								"c" => $quantity,
 								"d" => $harga_satuan
 							));	
 			  
@@ -465,18 +407,18 @@ case "add_item_pengurangan_beli":
 
 	$no_nota 			= $_POST['no_nota'];	
 	$item_pengurangan 		= $_POST['item_pengurangan'];	
-	$qty 				= preg_replace('/[^0-9]/', '', $_POST['qty']);	
+	$quantity 				= preg_replace('/[^0-9]/', '', $_POST['quantity']);	
 	$harga_satuan		= preg_replace('/[^0-9]/', '', $_POST['harga_satuan']);	
 	
 
 	if ( $item_pengurangan != ""){
 		try{
-			$query = $koneksi->prepare("INSERT INTO tmp_pengurangan_beli  (no_nota,item_pengurangan,qty,harga_satuan)
+			$query = $koneksi->prepare("INSERT INTO tmp_pengurangan_beli  (no_nota,item_pengurangan,quantity,harga_satuan)
 													VALUES(:a,:b,:c,:d)");
 			$query->execute(array(
 								"a" => $no_nota,
 								"b" => $item_pengurangan,
-								"c" => $qty,
+								"c" => $quantity,
 								"d" => $harga_satuan
 							));	
 			  
@@ -490,90 +432,6 @@ case "add_item_pengurangan_beli":
 	}
 
 	
-
-break;
-case "update_qty_tmp_pengurangan":
-		
-	$qty  	= preg_replace('/[^0-9]/', '', $_POST['qty']);
-	$id 			= preg_replace('/[^0-9]/', '', $_POST['id']);		
-	
-
-	try{
-		$update = $koneksi->prepare("UPDATE tmp_pengurangan
-										SET 	qty		= :qty
-										WHERE   id		= :id ");
-		$update->execute(array(
-								"qty" 			=> $qty,
-								"id" 			=> $id
-							));	
-	}	  
-	catch ( PDOException $e)
-	{
-		header('HTTP/1.1 400 error'); //if error
-	}
-
-break;
-case "update_qty_tmp_pengurangan_beli":
-		
-	$qty  	= preg_replace('/[^0-9]/', '', $_POST['qty']);
-	$id 			= preg_replace('/[^0-9]/', '', $_POST['id']);		
-	
-
-	try{
-		$update = $koneksi->prepare("UPDATE tmp_pengurangan_beli
-										SET 	qty		= :qty
-										WHERE   id		= :id ");
-		$update->execute(array(
-								"qty" 			=> $qty,
-								"id" 			=> $id
-							));	
-	}	  
-	catch ( PDOException $e)
-	{
-		header('HTTP/1.1 400 error'); //if error
-	}
-
-break;
-case "update_harga_satuan_tmp_pengurangan":
-		
-	$harga_satuan  	= preg_replace('/[^0-9]/', '', $_POST['harga_satuan']);
-	$id 			= preg_replace('/[^0-9]/', '', $_POST['id']);		
-	
-
-	try{
-		$update = $koneksi->prepare("UPDATE tmp_pengurangan
-										SET 	harga_satuan		= :harga_satuan
-										WHERE   id					= :id ");
-		$update->execute(array(
-								"harga_satuan" 	=> $harga_satuan,
-								"id" 			=> $id
-							));	
-	}	  
-	catch ( PDOException $e)
-	{
-		header('HTTP/1.1 400 error'); //if error
-	}
-
-break;
-case "update_harga_satuan_tmp_pengurangan_beli":
-		
-	$harga_satuan  	= preg_replace('/[^0-9]/', '', $_POST['harga_satuan']);
-	$id 			= preg_replace('/[^0-9]/', '', $_POST['id']);		
-	
-
-	try{
-		$update = $koneksi->prepare("UPDATE tmp_pengurangan_beli
-										SET 	harga_satuan		= :harga_satuan
-										WHERE   id					= :id ");
-		$update->execute(array(
-								"harga_satuan" 	=> $harga_satuan,
-								"id" 			=> $id
-							));	
-	}	  
-	catch ( PDOException $e)
-	{
-		header('HTTP/1.1 400 error'); //if error
-	}
 
 break;
 case "delete_from_tmp_pengurangan":
@@ -613,19 +471,19 @@ case "delete_from_tmp_pengurangan_beli":
 
 break;
 
-case "update_qty_retur_penjualan":
+case "update_quantity_retur_penjualan":
 		
-	$qty_retur  	= preg_replace('/[^0-9]/', '', $_POST['qty']);
+	$quantity_retur  	= preg_replace('/[^0-9]/', '', $_POST['quantity']);
 	$keterangan  	= $_POST['keterangan'];
 	$no_nota 		= preg_replace('/[^0-9]/', '', $_POST['no_nota']);		
 	$status_retur   = $_POST['status_retur'];
 
 	
 		$update = $koneksi->prepare("UPDATE item_transaksi
-										SET 	retur			= :qty_retur
-										WHERE 	no_nota			= :no_nota  AND item_transaksi.qty >= :qty_retur ");
+										SET 	retur			= :quantity_retur
+										WHERE 	no_nota			= :no_nota  AND item_transaksi.quantity >= :quantity_retur ");
 		$update->execute(array(
-								"qty_retur"		=> $qty_retur,
+								"quantity_retur"		=> $quantity_retur,
 								"no_nota" 		=> $no_nota
 							));	
 
@@ -724,19 +582,19 @@ case "update_keterangan_retur_penjualan":
 
 break;
 
-case "update_qty_retur_pembelian":
+case "update_quantity_retur_pembelian":
 		
-	$qty_retur  	= preg_replace('/[^0-9]/', '', $_POST['qty']);
+	$quantity_retur  	= preg_replace('/[^0-9]/', '', $_POST['quantity']);
 	$keterangan  	= $_POST['keterangan'];
 	$no_nota 		= preg_replace('/[^0-9]/', '', $_POST['no_nota']);		
 	$status_retur   = $_POST['status_retur'];
 
 	
 		$update = $koneksi->prepare("UPDATE item_transaksi
-										SET 	retur			= :qty_retur
-										WHERE 	no_nota			= :no_nota  AND item_transaksi.qty >= :qty_retur ");
+										SET 	retur			= :quantity_retur
+										WHERE 	no_nota			= :no_nota  AND item_transaksi.quantity >= :quantity_retur ");
 		$update->execute(array(
-								"qty_retur"		=> $qty_retur,
+								"quantity_retur"		=> $quantity_retur,
 								"no_nota" 		=> $no_nota
 							));	
 

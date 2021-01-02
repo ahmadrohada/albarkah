@@ -223,9 +223,7 @@ case "simpan_transaksi_penjualan":
 	$user_id			= $_POST['user_id'];
 	
 	$total_belanja  	= preg_replace('/[^0-9]/', '', $_POST['total_belanja']);
-	$total_komisi 		= preg_replace('/[^0-9]/', '', $_POST['total_komisi']);
-	$total_tambahan 	= preg_replace('/[^0-9]/', '', $_POST['total_tambahan']);
-	$total_pengurangan 	= preg_replace('/[^0-9]/', '', $_POST['total_pengurangan']);
+	$total_diskon  		= preg_replace('/[^0-9]/', '', $_POST['total_diskon']);
 	$bayar 				= preg_replace('/[^0-9]/', '', $_POST['bayar']);
 	$kembali 			= preg_replace('/[^0-9]/', '', $_POST['kembali']);
 
@@ -236,71 +234,35 @@ case "simpan_transaksi_penjualan":
 	//====================================   insert data dari tmp  ======================================//
 	$query = $koneksi->prepare(" SELECT * FROM tmp_transaksi WHERE no_nota = '$no_nota' ORDER by id ASC");
 	$no = 0;
-	$response = array();
 	$query->execute();
 	while($x = $query->fetch(PDO::FETCH_OBJ)) {
 		//INSERT KE TABLE REAL ITEM TRANSAKSI
-		$query_2 = $koneksi->prepare("INSERT INTO item_transaksi  (no_nota, jenis_transaksi ,nama_karung,qty,tonase,harga,upah_kuli,komisi)
-											VALUES(:a,:b,:c,:d,:e,:f,:g,:h)");
+		$query_2 = $koneksi->prepare("INSERT INTO item_transaksi  (no_nota,jenis_transaksi,id_barang,harga_beli,harga_jual,diskon,quantity)
+											VALUES(:a,:b,:c,:d,:e,:f,:g)");
 		$query_2->execute(array(
 							"a" => $x->no_nota,
 							"b" => $x->jenis_transaksi,
-							"c" => $x->nama_karung,
-							"d" => $x->qty,
-							"e" => $x->tonase,
-							"f" => $x->harga,
-							"g" => $x->upah_kuli,
-							"h" => $x->komisi
-						));	
+							"c" => $x->id_barang,
+							"d" => $x->harga_beli,
+							"e" => $x->harga_jual,
+							"f" => $x->diskon,
+							"g" => $x->quantity
+						));	 
 
 
 
 		//KURANGI DATA STOK
-		$update = $koneksi->prepare("UPDATE stok_beras
-					SET 	qty_stok	= stok_beras.qty_stok - :qty
-					WHERE   id			= :id ");
+		$update = $koneksi->prepare("UPDATE barang
+					SET 	stok		 = barang.stok - :quantity
+					WHERE   id	 		 = :id_barang ");
 		$update->execute(array(
-				"qty" 		=> $x->qty,
-				"id" 		=> $x->stok_beras_id
+				"quantity" 		=> $x->quantity,
+				"id_barang" 	=> $x->id_barang
 		));
 
 		
 		$no++;
 	}	
-
-//====================================   insert data dari tmp tambahan  ======================================//
-	$query_x = $koneksi->prepare(" SELECT * FROM tmp_tambahan WHERE no_nota = '$no_nota' ORDER by id ASC");
-	$response = array();
-	$query_x->execute();
-	while($x = $query_x->fetch(PDO::FETCH_OBJ)) {
-		//INSERT KE TABLE REAL ITEM TRANSAKSI
-		$query_y = $koneksi->prepare("INSERT INTO item_tambahan  (no_nota, item_tambahan ,qty,harga_satuan)
-											VALUES(:a,:b,:c,:d)");
-		$query_y->execute(array(
-							"a" => $x->no_nota,
-							"b" => $x->item_tambahan,
-							"c" => $x->qty,
-							"d" => $x->harga_satuan
-						));	
-	}	
-
-
-//====================================   insert data dari tmp pengurangan  ======================================//
-$query_a = $koneksi->prepare(" SELECT * FROM tmp_pengurangan WHERE no_nota = '$no_nota' ORDER by id ASC");
-$response = array();
-$query_a->execute();
-while($a = $query_a->fetch(PDO::FETCH_OBJ)) {
-	//INSERT KE TABLE REAL ITEM TRANSAKSI
-	$query_b = $koneksi->prepare("INSERT INTO item_pengurangan  (no_nota, item_pengurangan ,qty,harga_satuan)
-										VALUES(:a,:b,:c,:d)");
-	$query_b->execute(array(
-						"a" => $a->no_nota,
-						"b" => $a->item_pengurangan,
-						"c" => $a->qty,
-						"d" => $a->harga_satuan
-					));	
-}	
-	//=================================================================================================//
 
 
 	if ( $no >= 1 ){
@@ -310,25 +272,21 @@ while($a = $query_a->fetch(PDO::FETCH_OBJ)) {
 																	pelanggan_id,
 																	user_id,
 																	total_belanja, 
-																	total_komisi,
-																	total_tambahan,
-																	total_pengurangan,
+																	total_diskon,
 																	bayar,
 																	type_bayar,
 																	keterangan)
-									VALUES(:a,:b,:c,:d,:e,:f,:g,:k,:h,:i,:j)");
+									VALUES(:a,:b,:c,:d,:e,:f,:g,:k,:h)");
 		$query_3->execute(array(
 							"a" => $no_nota,
 							"b" => date('Y'."-".'m'."-".'d'." ".'H'.":".'i'.":".'s'),
 							"c" => $pelanggan_id,
 							"d" => $user_id,
 							"e" => $total_belanja,
-							"f" => $total_komisi,
-							"g" => $total_tambahan,
-							"k" => $total_pengurangan,
-							"h" => $bayar,
-							"i" => $type_bayar,
-							"j" => $keterangan
+							"f" => $total_diskon,
+							"g" => $bayar,
+							"k" => $type_bayar,
+							"h" => $keterangan
 
 							));	
 		$penjualan_id = $koneksi->lastInsertId();
@@ -342,17 +300,6 @@ while($a = $query_a->fetch(PDO::FETCH_OBJ)) {
 			$query_a->execute(array(
 								"a" => $no_nota
 							));	
-
-			$query_b = $koneksi->prepare("DELETE FROM tmp_tambahan  WHERE no_nota = :a ");
-			$query_b->execute(array(
-								"a" => $no_nota
-							));	
-
-			$query_c = $koneksi->prepare("DELETE FROM tmp_pengurangan  WHERE no_nota = :a ");
-			$query_c->execute(array(
-								"a" => $no_nota
-							));	
-
 
 			echo $penjualan_id;
 			header('HTTP/1.1 200 Sukses'); //if sukses
